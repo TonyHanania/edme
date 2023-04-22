@@ -1,21 +1,26 @@
 import React from "react";
-
-const Dashboard = (user) => {
-  console.log(user);
+import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "./UserContext";
+import UserProfile from "./UserProfile";
+import SubjectCard from "./SubjectCards";
+const Dashboard = () => {
+  const { currentUser, setCurrentUser } = useContext(UserContext);
+  console.log("i am freom profile ", currentUser ? currentUser.email : null);
+  if (!currentUser) {
+    return <p>Loading</p>;
+  }
   return (
     <>
-      <p>Admin dashboard</p>
-
+      <button>
+        <Link to={`/setprofile/${currentUser.email}`}>Profile</Link>
+      </button>
       <div className="profile">
-        <p>Welcome, username</p>
-        <p>image</p>
-        <p>bio word limit</p>
+        <UserProfile />
       </div>
 
       <div className="classCards">
-        <div className="classcard1">Science</div>
-        <div className="classcard2">Geography</div>
-        <div className="classcard3">Math</div>
+        <SubjectCard />
       </div>
     </>
   );

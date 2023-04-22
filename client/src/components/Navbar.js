@@ -5,22 +5,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faRectangleXmark } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../assets/logo.png";
 import styled from "styled-components";
-
+import { UserContext } from "./UserContext";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
 const Navbar = () => {
   //hamburger menu
   const [isOpen, setIsOpen] = useState(false);
-
+  const { currentUser, setCurrentUser } = useContext(UserContext);
   function toggleMenu() {
     setIsOpen(!isOpen);
   }
 
-  //getting auth0 information
-  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  console.log(isAuthenticated);
-  const Navigate = useNavigate();
-  console.log("I am user  ", user);
+  // //getting auth0 information
+  const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
+
+  // if (user) {
+  //   setCurrentUser(user.email);
+  //   console.log("I am current user ", currentUser);
+  // }
 
   return (
     <>

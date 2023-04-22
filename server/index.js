@@ -5,11 +5,17 @@ const morgan = require("morgan");
 const port = 8000;
 
 const {
-  getAllCustomers,
+  getAllUsers,
   getUser,
   addUser,
   setProfile,
   getPasswordVerification,
+  getUserByEmail,
+  getSubjects,
+  createModule,
+  getModule,
+  confirmUserRole,
+  addCohort,
 } = require("./handlers.js");
 
 express()
@@ -34,14 +40,22 @@ express()
     res.status(200).json("Hello ME! bacon");
   })
 
-  .get("/getusers", getAllCustomers)
+  .get("/getusers", getAllUsers)
 
-  .get("/getuser/:_id", getUser)
+  // .get("/getuser/:_id", getUser)
   .post("/registration", addUser)
 
-  .patch("/setprofile", setProfile)
+  .patch("/setprofile/:email", setProfile)
+
+  .post("/createcohort", addCohort)
   // Returns the customer who is trying to login (Used in Signin.js)
   .post("/getpasswordverification", getPasswordVerification)
+
+  .get("/getuser/:email", getUserByEmail)
+  .get("/subjects", getSubjects)
+  .post("/createmodule", createModule)
+  .get("/displaymodule", getModule)
+  .patch("/user/:email/confirm", confirmUserRole)
   .listen(port, () => {
     console.log(console.log(`example app on  ${port}`));
   });

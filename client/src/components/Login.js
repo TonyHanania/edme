@@ -18,9 +18,11 @@ const Login = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  console.log(formData);
   const handleSubmit = (e) => {
     e.preventDefault();
-    formData.password = bcrypt.hashSync(formData.password, 10);
+    // formData.password = bcrypt.hashSync(formData.password, 10);
     fetch("/getpasswordverification", {
       method: "POST",
       headers: {
@@ -42,7 +44,7 @@ const Login = () => {
             console.log("Response data: ", resData); // log the response data
 
             if (resData.status === 201) {
-              navigate("/login");
+              navigate("/dashboard");
             } else {
               window.alert(resData.message);
             }
