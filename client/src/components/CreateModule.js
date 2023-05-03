@@ -1,16 +1,74 @@
 import React, { useState } from "react";
 import FileBase64 from "react-file-base64";
+import DisplayModule from "./DisplayModule";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
+
+const CreateModuleContainer = styled.div`
+  form {
+    height: 30rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 2rem;
+    @media (max-width: 900px) {
+      margin-top: 5rem;
+      height: 50rem;
+    }
+    @media (max-width: 500px) {
+      height: 50rem;
+    }
+  }
+  .title {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    height: 6rem;
+  }
+  textarea {
+    width: 50rem;
+    height: 15rem;
+    @media (max-width: 700px) {
+      width: 25rem;
+    }
+  }
+  div {
+    margin: 1rem;
+  }
+`;
+
+const Button = styled.button`
+  width: 8rem;
+  background-color: #f5fdf2;
+  padding: 1rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  margin: 1rem;
+  font-weight: 900;
+  border-radius: 5px;
+  :hover {
+    scale: 1.2;
+  }
+`;
+
+const Quiz = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  @media (max-width: 700px) {
+    flex-direction: column;
+  }
+`;
 const CreateModule = () => {
   const [isClicked, setIsClicked] = useState(false);
   const [fileSelected, setFileSelected] = useState("");
   const [cloudinary, setCloudinary] = useState(false);
-
-  const [category, setCategory] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-  const [numQuestions, setNumQuestions] = useState("");
-
+  const { cohortId, subject } = useParams();
+  console.log(cohortId);
   const [module, setModule] = useState({
-    subject: "Science",
+    subject: subject,
     number: "",
     title: "",
     quiz: {
@@ -21,6 +79,7 @@ const CreateModule = () => {
     lesson: "",
     resourcePhoto: "",
     resourcePdf: "",
+    cohortId: cohortId,
   });
   const handleInputChange = (e) => {
     setModule({
@@ -60,6 +119,7 @@ const CreateModule = () => {
           if (xhr.status === 200) {
             const responseJson = JSON.parse(xhr.responseText);
             console.log(responseJson);
+
             setModule({
               ...module,
               resourcePdf: responseJson.url,
@@ -73,13 +133,12 @@ const CreateModule = () => {
       };
     }
   };
-
+  console.log("outsiode path ", cloudinary);
   const handleSubmit = (e) => {
     uploadFile();
-
     e.preventDefault();
-    console.log(module);
-    // Make a POST request to your backend API with the module data
+    console.log("inside", cloudinary);
+
     cloudinary &&
       fetch("/createmodule", {
         method: "POST",
@@ -90,14 +149,14 @@ const CreateModule = () => {
       })
         .then((response) => {
           response.json();
+          setCloudinary(false);
           console.log(response);
         })
         .then((data) => {
           console.log(data);
-
-          // Clear the form and set isClicked to false to close the form
+          window.location.reload();
           setModule({
-            subject: "Science",
+            subject: "",
             number: "",
             title: "",
             quiz: {
@@ -116,7 +175,7 @@ const CreateModule = () => {
 
   const handleCancel = (e) => {
     setModule({
-      subject: "Science",
+      subject: "",
       number: "",
       title: "",
       quiz: {
@@ -133,33 +192,33 @@ const CreateModule = () => {
 
   console.log(module, fileSelected);
   return (
-    <>
+    <CreateModuleContainer>
       {!isClicked ? (
         <>
           <p>Create Module </p>
-          <button
+
+          <Button
             onClick={() => {
               setIsClicked(true);
             }}
           >
             {" "}
             Create Module{" "}
-          </button>
+          </Button>
         </>
       ) : null}
       {isClicked ? (
         <>
-          <button>Add Module</button>
-          <button
+          <Button
             onClick={() => {
               handleCancel();
             }}
           >
             Cancel
-          </button>
+          </Button>
 
           <form>
-            <div>
+            <div className="title">
               <label>
                 Number in series:
                 <input
@@ -170,7 +229,7 @@ const CreateModule = () => {
                 />
               </label>
               <label>
-                title
+                Title
                 <input
                   onChange={handleInputChange}
                   name="title"
@@ -192,7 +251,7 @@ const CreateModule = () => {
               </label>
             </div>
 
-            <div>
+            <Quiz>
               <label>
                 Category:
                 <select
@@ -218,27 +277,7 @@ const CreateModule = () => {
                   name="numOfQuestions"
                   type="number"
                   value={module.quiz.numOfQuestionsQuestions}
-                  onChange={
-                    handleQuizInputChange
-                    //   (e) => {
-                    //   if (category === "19" && difficulty === "easy") {
-                    //     setNumQuestions("8");
-                    //     e.target.value = "8";
-                    //   } else if (category === "19" && difficulty === "medium") {
-                    //     setNumQuestions("16");
-                    //     e.target.value = "16";
-                    //   } else if (
-                    //     category === "19" &&
-                    //     difficulty === "hard" &&
-                    //     e.target.value > 12
-                    //   ) {
-                    //     setNumQuestions("");
-                    //     alert("Choose up to 12");
-                    //   } else {
-                    //     setNumQuestions(e.target.value);
-                    //   }
-                    // }
-                  }
+                  onChange={handleQuizInputChange}
                 />
               </label>
 
@@ -279,43 +318,40 @@ const CreateModule = () => {
                   Hard
                 </label>
               </label>
-              {/* <label>
-                <input
-                  type="input"
-                  name="quiz"
-                  value={module.quiz}
-                  onChange={handleInputChange}
-                />
-              </label> */}
 
               <br />
+            </Quiz>
+            <div>
+              <span>Upload Image Files: </span>
+              <FileBase64
+                multiple={false}
+                onDone={({ base64 }) =>
+                  setModule({ ...module, resourcePhoto: base64 })
+                }
+                name="resource"
+                value={module.resourcePhoto}
+              />
             </div>
-            <div></div>
 
-            <FileBase64
-              multiple={false}
-              onDone={({ base64 }) =>
-                setModule({ ...module, resourcePhoto: base64 })
-              }
-              name="resource"
-              value={module.resourcePhoto}
-            />
-            <p>resource</p>
-            <p>Upload</p>
+            <div>
+              <span>Upload PDF Files: </span>
 
-            <input
-              type="file"
-              name="resourcePdf"
-              onChange={(e) => {
-                setFileSelected(e.target.files[0]);
-              }}
-            />
+              <input
+                type="file"
+                name="resourcePdf"
+                onChange={(e) => {
+                  setFileSelected(e.target.files[0]);
+                }}
+              />
+            </div>
 
-            <button onClick={handleSubmit}>Submit </button>
+            <Button onClick={handleSubmit}>Submit </Button>
           </form>
         </>
       ) : null}
-    </>
+      <h3>Student View</h3>
+      <DisplayModule moduleData={module} />
+    </CreateModuleContainer>
   );
 };
 

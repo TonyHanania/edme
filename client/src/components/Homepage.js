@@ -40,7 +40,15 @@ const Homepage = () => {
 };
 
 const HomePageWrapper = styled.div`
-  margin-bottom: 15vh;
+  height: 40rem;
+
+  p {
+    line-height: 1.5;
+    margin: 1rem;
+  }
+  h1 {
+    margin: 1rem;
+  }
 `;
 
 export default Homepage;

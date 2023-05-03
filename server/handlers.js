@@ -66,81 +66,42 @@ const getUser = async (req, res) => {
   }
 };
 
-// Adds a new customer when they register
-const addUser = async (req, res) => {
-  // creates a new client
-  const client = new MongoClient(MONGO_URI, options);
-
-  // connect to the client
-  await client.connect();
-
-  try {
-    // connect to the database
-    const db = await client.db("Edme");
-
-    // create/access a new collection called "customers"
-    const customersCollection = db.collection("adminusers");
-
-    // Add new _id to customer array
-    const _id = uuidv4();
-
-    // Destructure req.body
-    const { ...FormData } = req.body;
-
-    // Add the generated ID to the request body
-    const requestBody = { _id, ...FormData };
-    console.log("I am request body  ", requestBody);
-    // insert a new document into the "customers" collection
-    const result = await customersCollection.insertOne(requestBody);
-
-    if (result.acknowledged) {
-      // On success/no error, send
-      return res.status(201).json({
-        status: 201,
-        success: true,
-        message: "A new customer was successfully created",
-        data: requestBody,
-      });
-    }
-
-    return res.status(500).json({
-      status: 500,
-      success: false,
-      message: "Could not register the customer",
-    });
-  } catch (error) {
-    return res
-      .status(404)
-      .json({ status: 404, success: false, message: error });
-  } finally {
-    // close the connection to the database server
-    client.close();
-  }
-};
-
 const setProfile = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
 
   await client.connect();
   const { email } = req.params;
 
-  const { image, bio, role, firstName, lastName, isconfirmed } = req.body;
+  const {
+    image,
+    bio,
+    role,
+    firstName,
+    lastName,
+    isconfirmed,
+    isSelected,
+    activeCohort,
+  } = req.body;
 
   const db = await client.db("Edme");
 
-  const customersCollection = db.collection("users");
+  const users = db.collection("users");
 
   try {
-    const result = await customersCollection.findOneAndUpdate(
+    const result = await users.findOneAndUpdate(
       { email: email },
       {
         $set: {
-          "profile.image": image,
-          "profile.bio": bio,
-          "profile.role": role,
-          "profile.firstName": firstName,
-          "profile.lastName": lastName,
-          "profile.isconfirmed": isconfirmed,
+          profile: {
+            image: image,
+            bio: bio,
+            role: role,
+            firstName: firstName,
+            lastName: lastName,
+            isconfirmed: isconfirmed,
+            isSelected: isSelected,
+            activeCohort: activeCohort,
+          },
         },
       },
       { returnOriginal: false }
@@ -203,10 +164,10 @@ const getUserByEmail = async (req, res) => {
   const db = await client.db("Edme");
 
   // access a collection called "customers"
-  const customersCollection = db.collection("users");
+  const usersCollection = db.collection("users");
 
   try {
-    const result = await customersCollection.findOne({ email: email });
+    const result = await usersCollection.findOne({ email: email });
 
     if (result) {
       return res
@@ -227,16 +188,13 @@ const getSubjects = async (req, res) => {
   // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
 
-  // access a collection called "customers"
-  const customersCollection = db.collection("subjects");
+  const subjectsCollection = db.collection("subjects");
   try {
-    const result = await customersCollection.find({}).toArray();
+    const result = await subjectsCollection.find({}).toArray();
 
     if (result) {
       return res.status(200).json({ status: 200, data: result });
@@ -246,14 +204,13 @@ const getSubjects = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
 
 const createModule = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  // connect to the client
+
   await client.connect();
   const db = client.db("Edme");
 
@@ -271,7 +228,7 @@ const createModule = async (req, res) => {
 
 const getModule = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  // connect to the client
+
   await client.connect();
   const db = client.db("Edme");
 
@@ -287,7 +244,6 @@ const getModule = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
@@ -331,14 +287,11 @@ const confirmUserRole = async (req, res) => {
 };
 
 const addCohort = async (req, res) => {
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
   try {
-    // connect to the database
     const db = await client.db("Edme");
 
     // create/access a new collection called "customers"
@@ -352,17 +305,43 @@ const addCohort = async (req, res) => {
 
     // Add the generated ID to the request body
     const requestBody = { _id, ...FormData };
-    console.log("I am request body  ", requestBody);
-    // insert a new document into the "customers" collection
-    const result = await customersCollection.insertOne(requestBody);
 
-    if (result.acknowledged) {
+    // Find users with matching emails and update activecohort
+    const usersCollection = db.collection("users");
+    const studentEmails = Object.values(requestBody.cohort.students).map(
+      (student) => student.email
+    );
+    const instructorEmail = requestBody.cohort.instructor.email;
+    const matchingDocuments = await usersCollection
+      .find({ email: { $in: studentEmails } })
+      .toArray();
+    console.log(matchingDocuments, "hiiiii  ");
+    // Update the activeCohort field in the profile object of all students and the instructor
+    const result = await usersCollection.updateMany(
+      { email: { $in: studentEmails } },
+      { $set: { "profile.activeCohort": _id } }
+    );
+
+    const result2 = await usersCollection.updateOne(
+      { email: instructorEmail },
+      { $set: { "profile.activeCohort": _id } }
+    );
+    // insert a new document into the "customers" collection
+    const insertionResult = await customersCollection.insertOne(requestBody);
+
+    if (
+      insertionResult.acknowledged &&
+      result.acknowledged &&
+      result2.acknowledged
+    ) {
       // On success/no error, send
       return res.status(201).json({
         status: 201,
         success: true,
-        message: "A new cohort was successfully created",
+        message:
+          "A new cohort was successfully created and users' active cohorts were updated",
         data: requestBody,
+        result: matchingDocuments,
       });
     }
 
@@ -381,10 +360,263 @@ const addCohort = async (req, res) => {
   }
 };
 
+const updateGrades = async (req, res) => {
+  // const client = new MongoClient(MONGO_URI, options);
+
+  // await client.connect();
+
+  // const db = await client.db("Edme");
+
+  // const customersCollection = db.collection("grades");
+  // const { body } = req.body;
+  // try {
+  //   const result = await customersCollection.insertOne(body);
+
+  //   if (result.insertedCount === 1) {
+  //     return res.status(200).json({
+  //       status: 200,
+  //       success: true,
+  //       message: `Grade has been added to the database.`,
+  //     });
+  //   } else {
+  //     return res.status(500).json({
+  //       status: 500,
+  //       success: false,
+  //       message: `Failed to add grade to the database.`,
+  //     });
+  //   }
+  // } catch (error) {
+  //   return res
+  //     .status(500)
+  //     .json({ status: 500, success: false, message: error });
+  // } finally {
+  //   client.close();
+  // }
+  const client = new MongoClient(MONGO_URI, options);
+  // connect to the client
+  await client.connect();
+  const db = client.db("Edme");
+
+  const collection = db.collection("grades");
+
+  try {
+    const result = await collection.insertOne(req.body);
+    res.status(201).json(result);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error saving the module");
+  }
+};
+const updateProfile = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  await client.connect();
+  const { email } = req.params;
+  const { bio, image } = req.body;
+
+  const db = await client.db("Edme");
+
+  const customersCollection = db.collection("users");
+
+  try {
+    const updates = {};
+    if (bio) {
+      updates["profile.bio"] = bio;
+    }
+    if (image) {
+      updates["profile.image"] = image;
+    }
+    const result = await customersCollection.updateOne(
+      { email: email },
+      { $set: updates }
+    );
+    console.log("updates", updates);
+    if (result.modifiedCount === 1) {
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        message: `User with email ${email} has been updated.`,
+      });
+    } else {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: `User ${email} not found`,
+      });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 500, success: false, message: error });
+  } finally {
+    client.close();
+  }
+};
+
+const contactUs = async (req, res) => {
+  // Destructure req.body
+  const { ...data } = req.body;
+
+  // creates a new client
+  const client = new MongoClient(MONGO_URI, options);
+
+  // connect to the client
+  await client.connect();
+
+  // connect to the database
+  const db = await client.db("Edme");
+
+  // access a collection called "contactUs"
+  const contactUsCollection = db.collection("contactUs");
+  try {
+    // Add the date stamp to the request body
+    const requestBody = {
+      date: new Date(),
+      ...data,
+    };
+
+    // insert a new document into the "customers" collection
+    const result = await contactUsCollection.insertOne(requestBody);
+
+    if (result) {
+      // On success/no error, send
+      return res.status(201).json({
+        status: 201,
+        success: true,
+        message: "Thank you for your message. We will get back to you shortly.",
+      });
+    }
+    // on failure/error, send
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "Message was not submitted",
+    });
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ status: 404, success: false, message: error });
+  } finally {
+    // close the connection to the database server
+    client.close();
+  }
+};
+
+const getCustomerSupport = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  // connect to the client
+  await client.connect();
+
+  // connect to the database
+  const db = await client.db("Edme");
+
+  // access a collection called "contactUs"
+  const contactUsCollection = db.collection("contactUs");
+  try {
+    const result = await contactUsCollection.find({}).toArray();
+
+    if (result) {
+      return res.status(200).json({ status: 200, data: result });
+    }
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ status: 404, success: false, message: error });
+  } finally {
+    // close the connection to the database server
+    client.close();
+  }
+};
+
+const getGrades = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  // connect to the client
+  await client.connect();
+
+  // connect to the database
+  const db = await client.db("Edme");
+
+  // access a collection called "contactUs"
+  const gradesCollection = db.collection("grades");
+  try {
+    const result = await gradesCollection.find({}).toArray();
+
+    if (result) {
+      return res.status(200).json({ status: 200, data: result });
+    }
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ status: 404, success: false, message: error });
+  } finally {
+    // close the connection to the database server
+    client.close();
+  }
+};
+
+const updateModule = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  await client.connect();
+  const { moduleId } = req.params;
+  const { lesson, resourcePhoto, resourcePdf } = req.body;
+
+  const db = await client.db("Edme");
+
+  const modulesCollection = db.collection("modules");
+
+  try {
+    const updates = {};
+    if (lesson) {
+      updates["lesson"] = lesson;
+    }
+    if (resourcePhoto) {
+      updates["resourcePhoto"] = resourcePhoto;
+    }
+    if (resourcePdf) {
+      updates["resourcePdf"] = resourcePdf;
+    }
+
+    const moduleObjectId = ObjectId.createFromHexString(moduleId);
+    const result = await modulesCollection.updateOne(
+      { _id: moduleObjectId },
+      { $set: updates }
+    );
+
+    console.log("updates", updates, moduleId, moduleObjectId);
+
+    if (result.modifiedCount === 1) {
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        message: `Module with module Id ${moduleId} has been updated.`,
+      });
+    } else {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: `Module ${moduleId} not found`,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 500,
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  } finally {
+    client.close();
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUser,
-  addUser,
+
   setProfile,
   getPasswordVerification,
   getUserByEmail,
@@ -393,4 +625,10 @@ module.exports = {
   getModule,
   confirmUserRole,
   addCohort,
+  updateGrades,
+  updateProfile,
+  contactUs,
+  getCustomerSupport,
+  getGrades,
+  updateModule,
 };

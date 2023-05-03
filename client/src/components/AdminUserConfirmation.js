@@ -2,11 +2,15 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import UserConfirmationComponent from "./AdminUserConfirmationComponent";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 const UserConfirmation = () => {
   const navigate = useNavigate();
+  const { email } = useParams();
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
   const [isClicked, setIsClicked] = useState(true);
+
   useEffect(() => {
     if (isClicked) {
       fetch("/getusers").then((response) => {
@@ -47,9 +51,10 @@ const UserConfirmation = () => {
   if (loading) {
     return <p>loading</p>;
   }
-  console.log(data);
+
   return (
     <>
+      <Link to={`/admin/dashboard/${email}`}> ↩ Admin Dashboard</Link>
       {data.map((user) => {
         return user.profile ? (
           <>
