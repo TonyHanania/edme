@@ -16,6 +16,12 @@ const {
   getModule,
   confirmUserRole,
   addCohort,
+  updateProfile,
+  contactUs,
+  getCustomerSupport,
+  updateGrades,
+  getGrades,
+  updateModule,
 } = require("./handlers.js");
 
 express()
@@ -42,12 +48,9 @@ express()
 
   .get("/getusers", getAllUsers)
 
-  // .get("/getuser/:_id", getUser)
-  .post("/registration", addUser)
-
   .patch("/setprofile/:email", setProfile)
 
-  .post("/createcohort", addCohort)
+  .post("/admin/createcohort", addCohort)
   // Returns the customer who is trying to login (Used in Signin.js)
   .post("/getpasswordverification", getPasswordVerification)
 
@@ -56,6 +59,13 @@ express()
   .post("/createmodule", createModule)
   .get("/displaymodule", getModule)
   .patch("/user/:email/confirm", confirmUserRole)
+  .patch("/updategrade/:subject/:cohortId/:email", confirmUserRole)
+  .patch("/user/:email/updateprofile", updateProfile)
+  .post("/contactus", contactUs)
+  .get("/admin/customersupport", getCustomerSupport)
+  .post("/postgrades", updateGrades)
+  .get(`/getgrades`, getGrades)
+  .patch("/subject/:moduleId/updatemodule", updateModule)
   .listen(port, () => {
     console.log(console.log(`example app on  ${port}`));
   });

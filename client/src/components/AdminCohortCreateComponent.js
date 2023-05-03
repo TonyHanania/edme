@@ -1,35 +1,28 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import styled from "styled-components";
+const Button = styled.button`
+  width: 8rem;
+  background-color: #f5fdf2;
+  padding: 1rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  margin: 1rem;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  border-radius: 5px;
+  :hover {
+    scale: 1.2;
+    border: black 1px solid;
+  }
+`;
 const AdminCohortCreateComponent = ({ data, handleAdd, handleMinus }) => {
   const [cohort, setCohort] = useState("");
   const [names, setNames] = useState([]);
   const [added, setadded] = useState(false);
-  //   const handleAdd = (name, role) => {
-  //     let newCohort = cohort;
-  //     if (role === "student") {
-  //       newCohort += `Student ${name}, `;
-  //     } else if (role === "instructor") {
-  //       newCohort += `Instructor ${name}, `;
-  //     }
-  //     setCohort(newCohort);
-  //     setNames([...names, name]);
-  //     setadded(true);
-  //   };
-  console.log(cohort, names);
-  //   const handleMinus = (nameToRemove) => {
-  //     const updatedNames = names.filter((name) => name !== nameToRemove);
-  //     const updatedCohort = updatedNames
-  //       .map(
-  //         (name) =>
-  //           `${name.role === "student" ? "Student" : "Instructor"} ${name.name}`
-  //       )
-  //       .join(", ");
-  //     setCohort(updatedCohort);
-  //     setNames(updatedNames);
-  //     setadded(false);
-  //   };
+
   return (
     <>
       <p>
@@ -37,12 +30,8 @@ const AdminCohortCreateComponent = ({ data, handleAdd, handleMinus }) => {
         {"  "}
         <span>{data.profile.role}</span> <span>{data._id}</span>
       </p>
-      {/* <button
-        onClick={() => handleAdd(data.profile.firstName, data.profile.role)}
-      >
-        {!added ? "Add" : "Undo"}
-      </button> */}
-      <button
+
+      <Button
         onClick={
           added
             ? () => {
@@ -56,19 +45,7 @@ const AdminCohortCreateComponent = ({ data, handleAdd, handleMinus }) => {
         }
       >
         {!added ? "Add" : "Undo"}
-      </button>
-      {/* <button
-        onClick={() => handleAdd(data.profile.firstName, data.profile.role)}
-      >
-        Add
-      </button> */}
-
-      {/* {names.map((name) => (
-        <div key={name}>
-          {name}
-          <button onClick={() => handleMinus(name)}>Remove</button>
-        </div>
-      ))} */}
+      </Button>
     </>
   );
 };

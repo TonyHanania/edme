@@ -12,7 +12,7 @@ const onRedirectCallback = (appState) => {
   window.history.push(
     appState && appState.targetUrl
       ? appState.targetUrl
-      : (window.location.href = "/dashboard")
+      : (window.location.href = "/")
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));

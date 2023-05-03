@@ -4,6 +4,52 @@ import { useState } from "react";
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import GlobalStyles from "./GlobalStyles";
+
+const FormContainer = styled.div`
+  border: rgb(221, 252, 229) 3px solid;
+  border-radius: 15px;
+  padding: 2rem;
+  height: 30rem;
+  width: 60rem;
+  margin: 4rem auto;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    margin: 1rem;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-items: space-evenly;
+
+    align-items: center;
+    div {
+      margin: 1rem;
+    }
+    textarea {
+      width: 30rem;
+      height: 10rem;
+    }
+  }
+`;
+
+const Button = styled.button`
+  width: 8rem;
+  background-color: #f5fdf2;
+  padding: 1rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  margin: 1rem;
+
+  border-radius: 5px;
+  :hover {
+    scale: 1.2;
+  }
+`;
 const SetProfile = () => {
   const [profile, setProfile] = useState({
     bio: "",
@@ -13,10 +59,11 @@ const SetProfile = () => {
     image: "",
     isconfirmed: false,
     isSelected: false,
+    activeCohort: "",
   });
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [isProfileSet, setIsProfileSet] = useState(false);
-
+  console.log(currentUser);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -28,107 +75,113 @@ const SetProfile = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (profile.bio !== "" && profile.image !== "" && profile.role !== "") {
-      setIsProfileSet(true);
-      setProfile({
-        ...profile,
-        isSelected: true,
-      });
-    }
-    console.log("isprofile is ", isProfileSet);
 
-    fetch(`/setprofile/${currentUser}`, {
+    if (profile.bio !== "" && profile.role !== "") {
+      setIsProfileSet(true);
+    }
+
+    fetch(`/setprofile/${currentUser.email}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(profile),
+      body: JSON.stringify({ ...profile, isSelected: true }),
     })
       .then((response) => {
-        navigate("/dashboard");
+        if (response.ok) {
+          // If the response is successful, update the current user in the context
+          setCurrentUser({
+            ...currentUser,
+            profile: { ...profile, isSelected: true },
+          });
+          navigate(`/dashboard/${currentUser.email}`);
+        } else {
+          throw new Error("Failed to update profile");
+        }
       })
       .catch((error) => {
+        console.log(error);
         // Handle error here
       });
   };
-
+  console.log(profile);
+  console.log("isprofile is ", profile.isSelected, profile.activeCohort);
   return (
-    <form onSubmit={handleSubmit}>
-      {/* <label>
-        Upload picture:
-        <input type="file" onChange={handleInputChange} />
-      </label> */}
-      <FileBase64
-        multiple={false}
-        onDone={({ base64 }) => setProfile({ ...profile, image: base64 })}
-        name="image"
-        value={profile.image}
-      />
-      <label>
-        bio:
-        <textarea
-          type="input"
-          onChange={handleInputChange}
-          name="bio"
-          value={profile.bio}
-        />
-      </label>
+    <FormContainer>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <span>Upload your Image: </span>
+          <FileBase64
+            multiple={false}
+            onDone={({ base64 }) => setProfile({ ...profile, image: base64 })}
+            name="image"
+            value={profile.image}
+          />
+        </div>
 
-      <label>
-        First Name:
-        <input
-          onChange={handleInputChange}
-          name="firstName"
-          value={profile.firstName}
-          type="input"
-        />
-      </label>
-
-      <label>
-        Last Name:
-        <input
-          type="input"
-          onChange={handleInputChange}
-          name="lastName"
-          value={profile.lastName}
-        />
-      </label>
-
-      <div>
-        <label>
+        <div>
           {" "}
-          Role
-          <input
-            type="radio"
-            value="instructor"
-            name="role"
-            // checked={selectedOption === "admin"}
-            onChange={handleInputChange}
-          />
-          Instructor
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="student"
-            name="role"
-            // checked={selectedOption === "admin"}
-            onChange={handleInputChange}
-          />
-          Student
-        </label>
-      </div>
+          <label>
+            Bio:
+            <textarea
+              type="input"
+              onChange={handleInputChange}
+              name="bio"
+              value={profile.bio}
+            />
+          </label>
+        </div>
 
-      <button type="submit">Submit</button>
-      {profile.image && (
-        <img
-          src={profile.image}
-          alt="Selected picture"
-          width="100px"
-          height="100px"
-        />
-      )}
-    </form>
+        <div>
+          {" "}
+          <label>
+            First Name:
+            <input
+              onChange={handleInputChange}
+              name="firstName"
+              value={profile.firstName}
+              type="input"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Last Name:
+            <input
+              type="input"
+              onChange={handleInputChange}
+              name="lastName"
+              value={profile.lastName}
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            {" "}
+            Role:
+            <input
+              type="radio"
+              value="instructor"
+              name="role"
+              onChange={handleInputChange}
+            />
+            Instructor
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="student"
+              name="role"
+              onChange={handleInputChange}
+            />
+            Student
+          </label>
+        </div>
+
+        <Button type="submit">Submit</Button>
+      </form>
+    </FormContainer>
   );
 };
 

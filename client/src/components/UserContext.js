@@ -2,10 +2,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
 import { useState } from "react";
 import { useEffect, createContext } from "react";
+import { useParams } from "react-router-dom";
 
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
+  const { admin } = useParams();
+
   const { isAuthenticated, user } = useAuth0();
   const [currentUser, setCurrentUser] = useState(() => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -25,7 +28,6 @@ export const UserProvider = ({ children }) => {
         .then((parsedData) => {
           setCurrentUser(parsedData.data);
           setStatus("idle");
-          console.log("i am fdrom context  ", parsedData.data);
         })
 
         .catch((error) => {
@@ -33,7 +35,7 @@ export const UserProvider = ({ children }) => {
         });
     }
   }, [isAuthenticated]);
-  console.log(user, isAuthenticated);
+
   return (
     <>
       <UserContext.Provider

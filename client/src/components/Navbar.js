@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,44 +15,46 @@ const Navbar = () => {
   function toggleMenu() {
     setIsOpen(!isOpen);
   }
-
-  // //getting auth0 information
-  const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
-
-  // if (user) {
-  //   setCurrentUser(user.email);
-  //   console.log("I am current user ", currentUser);
-  // }
-
+  const { isAuthenticated, logout, loginWithRedirect, user } = useAuth0();
   return (
     <>
       <NavBarWrapper>
         <img src={Logo} className="logo" />
         <nav className="navMenu">
           <div className="hamburgerMenu">
-            <button className="hamburgerMenuButton" onClick={toggleMenu}>
+            <Button className="hamburgerMenuButton" onClick={toggleMenu}>
               {!isOpen ? (
                 <FontAwesomeIcon icon={faBars} size="2x" />
               ) : (
                 <FontAwesomeIcon icon={faRectangleXmark} size="2x" />
               )}
-            </button>
+            </Button>
             {isOpen && (
               <>
-                <ul>
+                <ul className="hamburgerUl">
                   <li>
-                    <Link path="/aboutus">About Us</Link>
+                    {currentUser ? (
+                      <NavLink to={`/dashboard/${currentUser.email}`}>
+                        Dashboard
+                      </NavLink>
+                    ) : (
+                      <NavLink to="/services">Services</NavLink>
+                    )}
                   </li>
                   <li>
-                    <Link path="services">Services</Link>
+                    <NavLink to="/contactus">Contact us</NavLink>
                   </li>
                   <li>
                     {!isAuthenticated ? (
-                      <button onClick={() => loginWithRedirect()}>
-                        Sign in
-                      </button>
+                      <Button
+                        onClick={() => {
+                          loginWithRedirect();
+                        }}
+                      >
+                        Sign in!
+                      </Button>
                     ) : (
-                      <button onClick={() => logout()}> sign out</button>
+                      <Button onClick={() => logout()}> Sign out!</Button>
                     )}
                   </li>
                 </ul>
@@ -62,16 +64,22 @@ const Navbar = () => {
 
           <ul className="navMenuList">
             <li className="navMenuListItem">
-              <Link path="/aboutus">About Us</Link>
+              {currentUser ? (
+                <NavLink to={`/dashboard/${currentUser.email}`}>
+                  Dashboard
+                </NavLink>
+              ) : (
+                <NavLink to="/services">Services</NavLink>
+              )}
             </li>
             <li className="navMenuListItem">
-              <Link path="services">Services</Link>
+              <NavLink to="/contactus">Contact us</NavLink>
             </li>
             <li className="navMenuListItem">
               {!isAuthenticated ? (
-                <button onClick={() => loginWithRedirect()}>Sign in</button>
+                <Button onClick={() => loginWithRedirect()}>Sign in!</Button>
               ) : (
-                <button onClick={() => logout()}> sign out</button>
+                <Button onClick={() => logout()}> Sign out!</Button>
               )}
             </li>
           </ul>
@@ -82,12 +90,15 @@ const Navbar = () => {
 };
 
 const NavBarWrapper = styled.div`
-  background-color: rgb(221, 252, 229);
+  border: rgb(221, 252, 229) 2px solid;
+  background-color: #f5fdf2;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: fit-content;
-
+  height: 6rem;
+  .hamburgerUl {
+    list-style: none;
+  }
   .navMenu {
     width: 75%;
   }
@@ -99,25 +110,38 @@ const NavBarWrapper = styled.div`
     justify-content: space-between;
     width: 95%;
     height: fit-content;
+    margin-top: 1rem;
   }
 
   .navMenuListItem {
+    font-size: 1rem;
   }
 
   .hamburgerMenu {
     display: none;
     position: absolute;
-    right: 1.5vw;
-    top: 1vh;
+    right: 1rem;
+    top: 1rem;
     z-index: 1;
-    background-color: rgb(221, 252, 229);
-    width: 60%;
+
+    width: 80%;
+
+    .hamburgerUl {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-content: flex-start;
+      height: 3rem;
+      margin-right: 2rem;
+    }
   }
 
   .hamburgerMenuButton {
     position: absolute;
     right: 0;
     border-radius: 50%;
+    background-color: #f5fdf2;
+    font-size: 1rem;
   }
 
   .signup {
@@ -138,5 +162,17 @@ const NavBarWrapper = styled.div`
       /* Hide the navigation menu on small screens */
     }
   }
+`;
+const Button = styled.button`
+  background-color: #f5fdf2;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+`;
+
+const NavLink = styled(Link)`
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: black;
 `;
 export default Navbar;
