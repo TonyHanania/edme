@@ -61,10 +61,6 @@ const Div = styled.div`
       @media (max-width: 300px) {
         width: 15rem;
       }
-
-      /* @media (min-width: 900px) {
-        width: 60rem;
-      } */
     }
   }
 `;
@@ -98,17 +94,6 @@ const DisplayModule = ({
   const [isResourcePdfClicked, setIsResourcePdfClicked] = useState(false);
 
   const [isClicked, setIsClicked] = useState(false);
-
-  // const complete =
-  //   grades &&
-  //   moduleData &&
-  //   currentUser &&
-  //   grades.filter((grade) => {
-  //     return (
-  //       currentUser.email === grade.studentEmail &&
-  //       grade.moduleId === moduleData._id
-  //     );
-  //   });
 
   const complete =
     grades &&
@@ -243,7 +228,7 @@ const DisplayModule = ({
     });
   };
   if (!moduleData) {
-    return <p>loading</p>;
+    return <p>loading i am from display module</p>;
   }
   return (
     <>

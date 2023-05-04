@@ -57,8 +57,7 @@ const TrackerDiv = styled.div`
   justify-content: center;
 `;
 const SubjectCards = () => {
-  const { userRole, currentUser } = useContext(UserContext);
-  console.log(currentUser, "subject cards   ");
+  const { currentUser } = useContext(UserContext);
   const [data, setData] = useState();
   const navigate = useNavigate();
   useEffect(() => {

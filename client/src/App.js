@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Homepage from "./components/Homepage";
 import GlobalStyles from "./components/GlobalStyles";
 import Navbar from "./components/Navbar";
-
 import Dashboard from "./components/Dashboard";
 import SignUpForm from "./components/Registration";
 import SetProfile from "./components/SetProfile";

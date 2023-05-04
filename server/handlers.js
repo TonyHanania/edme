@@ -12,22 +12,16 @@ const options = {
   useUnifiedTopology: true,
 };
 
-//returns all users
-//Returns all registered customers
 const getAllUsers = async (req, res) => {
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
 
-  // access a collection called "customers"
-  const customersCollection = db.collection("users");
+  const usersCollection = db.collection("users");
   try {
-    const result = await customersCollection.find({}).toArray();
+    const result = await usersCollection.find({}).toArray();
 
     if (result) {
       return res.status(200).json({ status: 200, data: result });
@@ -37,11 +31,9 @@ const getAllUsers = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
-//Returns customer email and id
 const getUser = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
@@ -61,7 +53,6 @@ const getUser = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
@@ -124,14 +115,11 @@ const setProfile = async (req, res) => {
 };
 
 const getPasswordVerification = async (req, res) => {
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
   const { email, password } = req.body;
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
 
   const result = await db.collection("adminusers").findOne({
@@ -152,18 +140,14 @@ const getPasswordVerification = async (req, res) => {
 };
 
 const getUserByEmail = async (req, res) => {
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
   const { email } = req.params;
 
-  // connect to the database
   const db = await client.db("Edme");
 
-  // access a collection called "customers"
   const usersCollection = db.collection("users");
 
   try {
@@ -179,13 +163,11 @@ const getUserByEmail = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
 
 const getSubjects = async (req, res) => {
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
   await client.connect();
@@ -294,19 +276,14 @@ const addCohort = async (req, res) => {
   try {
     const db = await client.db("Edme");
 
-    // create/access a new collection called "customers"
     const customersCollection = db.collection("cohorts");
 
-    // Add new _id to customer array
     const _id = uuidv4();
 
-    // Destructure req.body
     const { ...FormData } = req.body;
 
-    // Add the generated ID to the request body
     const requestBody = { _id, ...FormData };
 
-    // Find users with matching emails and update activecohort
     const usersCollection = db.collection("users");
     const studentEmails = Object.values(requestBody.cohort.students).map(
       (student) => student.email
@@ -316,7 +293,6 @@ const addCohort = async (req, res) => {
       .find({ email: { $in: studentEmails } })
       .toArray();
     console.log(matchingDocuments, "hiiiii  ");
-    // Update the activeCohort field in the profile object of all students and the instructor
     const result = await usersCollection.updateMany(
       { email: { $in: studentEmails } },
       { $set: { "profile.activeCohort": _id } }
@@ -326,7 +302,6 @@ const addCohort = async (req, res) => {
       { email: instructorEmail },
       { $set: { "profile.activeCohort": _id } }
     );
-    // insert a new document into the "customers" collection
     const insertionResult = await customersCollection.insertOne(requestBody);
 
     if (
@@ -334,7 +309,6 @@ const addCohort = async (req, res) => {
       result.acknowledged &&
       result2.acknowledged
     ) {
-      // On success/no error, send
       return res.status(201).json({
         status: 201,
         success: true,
@@ -355,45 +329,12 @@ const addCohort = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
 
 const updateGrades = async (req, res) => {
-  // const client = new MongoClient(MONGO_URI, options);
-
-  // await client.connect();
-
-  // const db = await client.db("Edme");
-
-  // const customersCollection = db.collection("grades");
-  // const { body } = req.body;
-  // try {
-  //   const result = await customersCollection.insertOne(body);
-
-  //   if (result.insertedCount === 1) {
-  //     return res.status(200).json({
-  //       status: 200,
-  //       success: true,
-  //       message: `Grade has been added to the database.`,
-  //     });
-  //   } else {
-  //     return res.status(500).json({
-  //       status: 500,
-  //       success: false,
-  //       message: `Failed to add grade to the database.`,
-  //     });
-  //   }
-  // } catch (error) {
-  //   return res
-  //     .status(500)
-  //     .json({ status: 500, success: false, message: error });
-  // } finally {
-  //   client.close();
-  // }
   const client = new MongoClient(MONGO_URI, options);
-  // connect to the client
   await client.connect();
   const db = client.db("Edme");
 
@@ -455,39 +396,28 @@ const updateProfile = async (req, res) => {
 };
 
 const contactUs = async (req, res) => {
-  // Destructure req.body
   const { ...data } = req.body;
 
-  // creates a new client
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
-
-  // access a collection called "contactUs"
   const contactUsCollection = db.collection("contactUs");
   try {
-    // Add the date stamp to the request body
     const requestBody = {
       date: new Date(),
       ...data,
     };
-
-    // insert a new document into the "customers" collection
     const result = await contactUsCollection.insertOne(requestBody);
 
     if (result) {
-      // On success/no error, send
       return res.status(201).json({
         status: 201,
         success: true,
         message: "Thank you for your message. We will get back to you shortly.",
       });
     }
-    // on failure/error, send
     return res.status(400).json({
       status: 400,
       success: false,
@@ -498,7 +428,6 @@ const contactUs = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
@@ -506,13 +435,10 @@ const contactUs = async (req, res) => {
 const getCustomerSupport = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
 
-  // access a collection called "contactUs"
   const contactUsCollection = db.collection("contactUs");
   try {
     const result = await contactUsCollection.find({}).toArray();
@@ -525,7 +451,6 @@ const getCustomerSupport = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
@@ -533,13 +458,10 @@ const getCustomerSupport = async (req, res) => {
 const getGrades = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
 
-  // connect to the client
   await client.connect();
 
-  // connect to the database
   const db = await client.db("Edme");
 
-  // access a collection called "contactUs"
   const gradesCollection = db.collection("grades");
   try {
     const result = await gradesCollection.find({}).toArray();
@@ -552,7 +474,6 @@ const getGrades = async (req, res) => {
       .status(404)
       .json({ status: 404, success: false, message: error });
   } finally {
-    // close the connection to the database server
     client.close();
   }
 };
@@ -616,7 +537,6 @@ const updateModule = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUser,
-
   setProfile,
   getPasswordVerification,
   getUserByEmail,

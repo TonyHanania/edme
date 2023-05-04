@@ -5,6 +5,7 @@ import { useContext } from "react";
 import styled from "styled-components";
 import DisplayModules from "./DisplayModules";
 import { Link } from "react-router-dom";
+import CircularLoader from "./Loader";
 
 const InstructorLink = styled(Link)`
   color: black;
@@ -55,7 +56,7 @@ const SubjectPage = () => {
 
   return (
     <>
-      {!currentUser ? <p>Loading</p> : null}
+      {!currentUser ? <CircularLoader /> : null}
       {currentUser && currentUser.profile.role === "instructor" ? (
         <InstructorSubjectPageContainer>
           <Subject>{subject}</Subject>
@@ -98,8 +99,5 @@ const SubjectPage = () => {
     </>
   );
 };
-const Lesson = styled.div`
-  white-space: pre-wrap;
-`;
-const AdvancedImage = styled.img``;
+
 export default SubjectPage;

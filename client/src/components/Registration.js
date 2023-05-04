@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+
 import bcrypt from "bcryptjs";
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const SignUpForm = () => {
     },
   });
 
-  console.log("I am formdata", formData);
+  
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -28,35 +28,7 @@ const SignUpForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     formData.password = bcrypt.hashSync(formData.password, 10);
-    // fetch(
-    //   "/registration",
-
-    //   {
-    //     headers: {
-    //       Accept: "application/json",
-    //     },
-
-    //     method: "POST",
-    //     body: JSON.stringify(formData),
-    //   }
-    // ).then((res) => {
-    //   if (res.status > 500) {
-    //     navigate("/errorPage");
-    //   } else {
-    //     res
-    //       .json()
-    //       .then((resData) => {
-    //         if (resData.status === 201) {
-    //           navigate("/");
-    //         } else {
-    //           window.alert(resData.message);
-    //         }
-    //       })
-    //       .catch((err) => {
-    //         window.alert(err + "  heeeeey ");
-    //       });
-    //   }
-    // });
+    
     fetch(
       "/registration",
 
@@ -71,16 +43,15 @@ const SignUpForm = () => {
       }
     )
       .then((res) => {
-        console.log("Response status: ", res.status); // log the response status
-        console.log("Response headers: ", res.headers); // log the response headers
+        console.log("Response status: ", res.status); 
+        console.log("Response headers: ", res.headers); 
 
         console.log(res);
 
-        // parse the response body as JSON
         res
           .json()
           .then((resData) => {
-            console.log("Response data: ", resData); // log the response data
+            console.log("Response data: ", resData); 
 
             if (resData.status === 201) {
               navigate("/login");
@@ -150,7 +121,7 @@ const SignUpForm = () => {
               type="radio"
               value="admin"
               name="role"
-              // checked={selectedOption === "admin"}
+     
               onChange={handleInputChange}
             />
             Admin
@@ -160,7 +131,7 @@ const SignUpForm = () => {
               type="radio"
               value="student"
               name="role"
-              // checked={selectedOption === "admin"}
+              
               onChange={handleInputChange}
             />
             Student

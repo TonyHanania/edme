@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 const ModuleButton = styled.button`
@@ -17,8 +17,7 @@ const QuizDiv = styled.div``;
 const MakeQuiz = ({
   moduleData,
   moduleId,
-  setQuizCompleted,
-  quizCompleted,
+
 }) => {
   const [grades, setGrades] = useState(null);
   const [questions, setQuestions] = useState([]);

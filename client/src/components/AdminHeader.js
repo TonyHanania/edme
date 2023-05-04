@@ -15,7 +15,6 @@ const NavBarWrapper = styled.div`
 const AdminHeader = () => {
   const { pathname } = useLocation();
 
-  // Check if the path starts with "/admin" and is not "/admin/login"
   const isAdminPath =
     pathname.startsWith("/admin") && pathname !== "/admin/login";
 

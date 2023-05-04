@@ -34,19 +34,27 @@ const Navbar = () => {
                 <ul className="hamburgerUl">
                   <li>
                     {currentUser ? (
-                      <NavLink to={`/dashboard/${currentUser.email}`}>
+                      <NavLink
+                        className="hamburger"
+                        to={`/dashboard/${currentUser.email}`}
+                      >
                         Dashboard
                       </NavLink>
                     ) : (
-                      <NavLink to="/services">Services</NavLink>
+                      <NavLink className="hamburger" to="/services">
+                        Services
+                      </NavLink>
                     )}
                   </li>
                   <li>
-                    <NavLink to="/contactus">Contact us</NavLink>
+                    <NavLink className="hamburger" to="/contactus">
+                      Contact us
+                    </NavLink>
                   </li>
                   <li>
                     {!isAuthenticated ? (
                       <Button
+                        className="hamburger"
                         onClick={() => {
                           loginWithRedirect();
                         }}
@@ -133,6 +141,10 @@ const NavBarWrapper = styled.div`
       align-content: flex-start;
       height: 3rem;
       margin-right: 2rem;
+
+      .hamburger {
+        font-size: 1rem;
+      }
     }
   }
 
@@ -159,7 +171,7 @@ const NavBarWrapper = styled.div`
 
     .navMenuList {
       display: none;
-      /* Hide the navigation menu on small screens */
+
     }
   }
 `;
@@ -168,6 +180,9 @@ const Button = styled.button`
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const NavLink = styled(Link)`
