@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { UserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import GlobalStyles from "./GlobalStyles";
+
 
 const FormContainer = styled.div`
   border: rgb(221, 252, 229) 3px solid;
@@ -89,7 +89,6 @@ const SetProfile = () => {
     })
       .then((response) => {
         if (response.ok) {
-          // If the response is successful, update the current user in the context
           setCurrentUser({
             ...currentUser,
             profile: { ...profile, isSelected: true },
@@ -101,7 +100,6 @@ const SetProfile = () => {
       })
       .catch((error) => {
         console.log(error);
-        // Handle error here
       });
   };
   console.log(profile);

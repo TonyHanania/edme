@@ -11,6 +11,26 @@ const Div = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+const Button = styled.button`
+  width: 8rem;
+  background-color: #f5fdf2;
+  padding: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 1rem;
+  .link {
+    color: black;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+
+  border-radius: 5px;
+  :hover {
+    scale: 1.2;
+  }
+`;
 const Dashboard = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
   console.log(currentUser);
@@ -25,10 +45,12 @@ const Dashboard = () => {
     <>
       {!currentUser.profile.isSelected && !currentUser.profile.isconfirmed ? (
         <>
-          <p>Please set your profile</p>
-          <button>
-            <Link to={`/setprofile/${currentUser.email}`}>Set Profile</Link>
-          </button>
+          <h2>Please set your profile</h2>
+          <Button>
+            <Link className="link" to={`/setprofile/${currentUser.email}`}>
+              Set Profile
+            </Link>
+          </Button>
         </>
       ) : null}{" "}
       {currentUser.profile.isSelected && !currentUser.profile.isconfirmed ? (

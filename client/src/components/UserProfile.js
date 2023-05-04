@@ -7,6 +7,109 @@ import styled from "styled-components";
 import { useAuth0 } from "@auth0/auth0-react";
 import FileBase64 from "react-file-base64";
 
+const ProfileContainer = styled.div`
+  textarea {
+    width: 100%;
+    height: 5rem;
+  }
+
+  display: flex;
+
+  justify-content: space-around;
+
+  img {
+    width: 15rem;
+    height: 15rem;
+    border-radius: 50%;
+    border: rgb(221, 252, 229) 3px solid;
+  }
+  .nameDiv {
+    border-bottom: rgb(221, 252, 229) 2px solid;
+    width: 35rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    justify-content: center;
+
+    div {
+      width: 100%;
+      height: 15rem;
+      button {
+        height: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+
+    button {
+      font-size: 0.6rem;
+      font-weight: 900;
+    }
+  }
+`;
+const Span = styled.span`
+  text-transform: capitalize;
+  font-weight: 400;
+`;
+
+const Bio = styled.div`
+  font-size: 1.5rem;
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  border-radius: 15px;
+  height: 17rem;
+  align-self: center;
+  border: rgb(221, 252, 229) 2px solid;
+  @media (max-width: 725px) {
+    height: 3rem;
+    font-size: 1rem;
+    justify-content: flex-end;
+    width: 60px;
+    border: none;
+  }
+`;
+const Button = styled.button`
+  width: 8rem;
+  background-color: #f5fdf2;
+  padding: 1rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 1rem;
+
+  border-radius: 5px;
+  :hover {
+    scale: 1.2;
+  }
+`;
+
+const P = styled.p`
+  font-weight: 700;
+`;
+const NamePic = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 22rem;
+`;
+
+const ImageDiv = styled.div`
+  display: flex;
+
+  div {
+    width: 50%;
+  }
+  button {
+    margin: 1rem;
+  }
+`;
+const Label = styled.label``;
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const { currentUser, userRole, setUserRole } = useContext(UserContext);
@@ -50,7 +153,7 @@ const UserProfile = () => {
       });
     }
   }, [currentUser, shouldUserFetch]);
-  console.log(profile.bio, profile.image, profile);
+
   const openupdatebio = () => {
     setIsClicked(true);
   };
@@ -168,108 +271,5 @@ const UserProfile = () => {
     </ProfileContainer>
   );
 };
-
-const ProfileContainer = styled.div`
-  textarea {
-    width: 100%;
-    height: 5rem;
-  }
-
-  display: flex;
-
-  justify-content: space-around;
-
-  img {
-    width: 15rem;
-    height: 15rem;
-    border-radius: 50%;
-    border: rgb(221, 252, 229) 3px solid;
-  }
-  .nameDiv {
-    border-bottom: rgb(221, 252, 229) 2px solid;
-    width: 35rem;
-    margin-bottom: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    justify-content: center;
-
-    div {
-      width: 100%;
-      height: 15rem;
-      button {
-        height: 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    }
-
-    button {
-      font-size: 0.6rem;
-      font-weight: 900;
-    }
-  }
-`;
-const Span = styled.span`
-  text-transform: capitalize;
-  font-weight: 400;
-`;
-
-const Bio = styled.div`
-  font-size: 1.5rem;
-  width: 45%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 2rem;
-  border-radius: 15px;
-  height: 17rem;
-  align-self: center;
-  border: rgb(221, 252, 229) 2px solid;
-  @media (max-width: 725px) {
-    height: 3rem;
-    font-size: 1rem;
-    justify-content: flex-end;
-    width: 60px;
-    border: none;
-  }
-`;
-const Button = styled.button`
-  width: 8rem;
-  background-color: #f5fdf2;
-  padding: 1rem;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  margin: 1rem;
-
-  border-radius: 5px;
-  :hover {
-    scale: 1.2;
-  }
-`;
-
-const P = styled.p`
-  font-weight: 700;
-`;
-const NamePic = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 22rem;
-`;
-
-const ImageDiv = styled.div`
-  display: flex;
-
-  div {
-    width: 50%;
-  }
-  button {
-    margin: 1rem;
-  }
-`;
-const Label = styled.label``;
 
 export default UserProfile;

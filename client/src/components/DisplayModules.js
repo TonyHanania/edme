@@ -5,17 +5,17 @@ import DisplayModule from "./DisplayModule";
 import { useParams } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import { useContext } from "react";
-const Container = styled.div`
-  border: red 1px solid;
+import CircularLoader from "./Loader";
+const Container = styled.div``;
 
-  div {
-    border: red 1px solid;
-  }
-`;
 const P = styled.p`
   font-weight: 700;
   font-size: 1rem;
   text-align: center;
+
+  :last-of-type {
+    margin-bottom: 6rem;
+  }
 `;
 const DisplayModules = () => {
   const [moduleInfo, setModuleInfo] = useState(null);
@@ -51,7 +51,7 @@ const DisplayModules = () => {
   }, [shouldModuleUpdate]);
 
   if (loading) {
-    return <p>loading</p>;
+    return <CircularLoader />;
   }
 
   const moduleArray = moduleInfo
@@ -112,6 +112,7 @@ const DisplayModules = () => {
               {incomplete.length - 1} more{" "}
               {incomplete.length - 1 === 1 ? "module" : "modules"} to go!
             </P>
+            <P>{incomplete.length === 0 ? "All done!" : null}</P>
           </div>
         )}
 
@@ -137,78 +138,3 @@ const DisplayModules = () => {
 };
 
 export default DisplayModules;
-
-// import React, { useEffect, useState } from "react";
-// import styled from "styled-components";
-// import MakeQuiz from "./MakeQuizz";
-// import DisplayModule from "./DisplayModule";
-// import { useParams } from "react-router-dom";
-
-// const Lesson = styled.div`
-//   white-space: pre-wrap;
-// `;
-
-// const DisplayModules = () => {
-//   const [moduleInfo, setModuleInfo] = useState(null);
-//   const [currentModule, setCurrentModule] = useState(0);
-
-//   const { subject, cohortId } = useParams();
-
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     setLoading(true);
-//     fetch(`/displaymodule`).then((response) => {
-//       if (response.status > 500) {
-//       } else {
-//         response
-//           .json()
-//           .then((resData) => {
-//             setLoading(false);
-//             setModuleInfo(resData.data);
-//           })
-//           .catch((err) => console.log(err));
-//       }
-//     });
-//   }, []);
-
-//   if (loading) {
-//     return <p>loading</p>;
-//   }
-
-//   const moduleArray = moduleInfo
-//     ? moduleInfo.filter(
-//         (module) => module.cohortId === cohortId && module.subject === subject
-//       )
-//     : null;
-//   console.log("hie its me  ", moduleArray.length);
-//   return (
-//     <>
-//       {moduleInfo.map((moduleData, index) => {
-//         const isCurrentModule = index === currentModule;
-//         const isCompleted = index < currentModule;
-//         return (
-//           <>
-//             <div key={moduleData._id}>
-//               {moduleData.subject === subject &&
-//               moduleData.cohortId === cohortId ? (
-//                 <div key={moduleData._id}>
-//                   {isCurrentModule ? (
-//                     <MakeQuiz
-//                       moduleData={moduleData}
-//                       onComplete={() => setCurrentModule(index + 1)}
-//                     />
-//                   ) : isCompleted ? (
-//                     <DisplayModule moduleData={moduleData} />
-//                   ) : null}
-//                 </div>
-//               ) : null}
-//             </div>
-//           </>
-//         );
-//       })}
-//     </>
-//   );
-// };
-
-// export default DisplayModules;

@@ -77,7 +77,7 @@ const InstructorGradebook = () => {
         (module) => module.cohortId === cohortId && module.subject === subject
       )
     : null;
-  console.log("hie its me  ", moduleArray ? moduleArray.length : "hmmmmm");
+
   const filteredGrades = grades.filter(
     (grade) => grade.cohortId === cohortId && grade.subject === subject
   );
@@ -98,8 +98,7 @@ const InstructorGradebook = () => {
     });
     return userGrade;
   });
-  console.log("i am users ", users);
-  console.log(filteredGrades);
+ 
   const moduleHeaders = moduleArray
     ? moduleArray.map((_, i) => <th key={i}>Module {i + 1}</th>)
     : null;
